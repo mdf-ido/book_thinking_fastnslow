@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thinking, Fast and Slow</title>
+    <link rel="stylesheet" href="{% static 'kahneman_game/styles.css' %}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Chapter 2 · Attention and Effort</p>
+          <h1>Thinking, Fast and Slow</h1>
+        </div>
+        <button id="camera-toggle" type="button" class="secondary-button">
+          Enable Camera
+        </button>
+      </header>
+
+      <main class="layout">
+        <section class="panel game-panel">
+          <div class="status-row">
+            <span>Level: <strong id="level-value">1</strong></span>
+            <span>Score: <strong id="score-value">0</strong></span>
+            <span>Lives: <strong id="lives-value">3</strong></span>
+          </div>
+
+          <div class="challenge-box">
+            <p class="label">Current challenge</p>
+            <div id="prompt-value" class="prompt-value">—</div>
+          </div>
+
+          <form id="answer-form" class="answer-form">
+            <label for="answer-input">Your answer</label>
+            <div class="answer-row">
+              <input
+                id="answer-input"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                maxlength="4"
+                placeholder="enter 4 digits"
+              />
+              <button type="submit">Submit</button>
+            </div>
+          </form>
+
+          <div id="message-box" class="message-box info">
+            Begin the task and add the level to each digit.
+          </div>
+        </section>
+
+        <aside class="panel camera-panel">
+          <h2>Webcam feed</h2>
+          <video id="camera-preview" autoplay muted playsinline></video>
+          <canvas id="eye-analysis-canvas" width="320" height="240" aria-label="Eye analysis debug canvas"></canvas>
+          <div class="retina-panel">
+            <div class="retina-label">Retina / pupil preview</div>
+            <canvas id="retina-preview" width="180" height="180" aria-label="Retina crop preview"></canvas>
+          </div>
+          <div class="camera-meta">
+            <span id="camera-status">Camera not active</span>
+            <span id="load-index">Load index: 0.0</span>
+          </div>
+          <div id="analysis-result" class="analysis-result info">
+            No analysis yet. Record a short clip to estimate pupil dilation.
+          </div>
+          <div class="attempt-panel">
+            <div class="attempt-header">
+              <span>Level attempts</span>
+              <span id="attempt-counter">0 / 4</span>
+            </div>
+            <div id="attempt-thumbnails" class="attempt-thumbnails" aria-live="polite"></div>
+          </div>
+          <div class="chart-panel">
+            <div class="chart-header">Dilation trend</div>
+            <canvas id="dilation-chart" width="260" height="120" aria-label="Dilation trend chart"></canvas>
+          </div>
+          <div id="analysis-log" class="analysis-log" aria-live="polite">
+            <div class="analysis-log-entry">Waiting for webcam...</div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="{% static 'kahneman_game/mediapipe/vision_bundle.js' %}"></script>
+    <script src="{% static 'kahneman_game/app.js' %}"></script>
+  </body>
+</html>

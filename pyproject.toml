@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "book-thinking-fast-slow"
+version = "0.1.0"
+description = "Experiments and explanations inspired by Daniel Kahneman's Thinking, Fast and Slow"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.15"
+numpy = ">=1.26.0,<3.0.0"
+django = ">=5.2,<6.2"
+gunicorn = ">=23.0.0,<27.0.0"
+opencv-python-headless = ">=4.10.0,<5.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

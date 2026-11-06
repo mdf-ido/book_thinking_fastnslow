@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    container_name: thinking-fast-slow-web
+    command: >
+      sh -c "python manage.py migrate &&
+      gunicorn book_project.wsgi:application --bind 0.0.0.0:8000 --workers 2"
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: book_project.settings
+      PYTHONUNBUFFERED: "1"
+    restart: unless-stopped
