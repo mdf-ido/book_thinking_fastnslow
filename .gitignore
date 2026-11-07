@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+staticfiles/
+tmp_uploads/
+db.sqlite3

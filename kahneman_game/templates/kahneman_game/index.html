@@ -4,36 +4,136 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thinking, Fast and Slow</title>
+    <title>{{ title|default:"Thinking, Fast and Slow · Chapter 2 Lab" }}</title>
     <link rel="stylesheet" href="{% static 'kahneman_game/styles.css' %}" />
   </head>
   <body>
     <div class="page-shell">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Chapter 2 · Attention and Effort</p>
+        <div class="brand">
+          <p class="eyebrow">Daniel Kahneman · Attention and Effort</p>
           <h1>Thinking, Fast and Slow</h1>
+          <p class="subtitle">System 2 Cognitive Load & Pupillometry Laboratory</p>
         </div>
-        <button id="camera-toggle" type="button" class="secondary-button">
-          Enable Camera
-        </button>
+        <div class="header-actions">
+          <button id="sim-toggle" type="button" class="secondary-button" title="Toggle Kahneman physiological simulation mode (works without webcam)">
+            🧪 Simulation Mode
+          </button>
+          <button id="camera-toggle" type="button" class="secondary-button" title="Enable live webcam & pupil tracking">
+            📹 Enable Camera
+          </button>
+          <button id="metronome-toggle" type="button" class="icon-button" title="Toggle 1-second pacing metronome (Beatty & Kahneman standard)" aria-label="Toggle metronome">
+            ⏱️ Metronome: <span id="metronome-status">Off</span>
+          </button>
+          <button id="sound-toggle" type="button" class="icon-button" title="Toggle audio feedback" aria-label="Toggle sound">
+            🔊 Sound: <span id="sound-status">On</span>
+          </button>
+          <button id="science-button" type="button" class="secondary-button text-btn" title="Read Chapter 2 scientific theory & findings">
+            📖 Science
+          </button>
+        </div>
       </header>
 
+      <!-- Experiment Mode Navigation -->
+      <nav class="mode-bar" aria-label="Cognitive Task Selection">
+        <span class="mode-label">Kahneman Tasks:</span>
+        <div class="mode-pills">
+          <button type="button" class="mode-pill active" data-mode="campaign" id="mode-campaign">
+            🎯 Campaign (Add 1 → 4)
+          </button>
+          <button type="button" class="mode-pill" data-mode="1" id="mode-add1">
+            Add-1 (System 2 Warmup)
+          </button>
+          <button type="button" class="mode-pill" data-mode="2" id="mode-add2">
+            Add-2 (Active Load)
+          </button>
+          <button type="button" class="mode-pill" data-mode="3" id="mode-add3">
+            Add-3 (Peak Capacity)
+          </button>
+          <button type="button" class="mode-pill" data-mode="4" id="mode-add4">
+            Add-4 (Overload Stress Test)
+          </button>
+        </div>
+      </nav>
+
+      <!-- Secondary Controls & Cognitive Lab Options -->
+      <div class="options-bar">
+        <div class="option-item">
+          <label for="pacing-select">Presentation:</label>
+          <select id="pacing-select">
+            <option value="simultaneous">Instant (All 4 Digits)</option>
+            <option value="sequential">Paced (1 Digit/sec Metronome)</option>
+          </select>
+        </div>
+        <div class="option-item">
+          <label>
+            <input type="checkbox" id="probe-toggle" />
+            Attentional Blindness Probe (The Invisible Gorilla)
+          </label>
+        </div>
+        <div class="option-item stats-badge">
+          <span>Avg Latency: <strong id="latency-value">—</strong></span>
+          <span>Streak: <strong id="streak-value">0</strong></span>
+        </div>
+      </div>
+
       <main class="layout">
+        <!-- Main Challenge Section -->
         <section class="panel game-panel">
           <div class="status-row">
-            <span>Level: <strong id="level-value">1</strong></span>
-            <span>Score: <strong id="score-value">0</strong></span>
-            <span>Lives: <strong id="lives-value">3</strong></span>
+            <div class="stat-box">
+              <span class="stat-label">Task</span>
+              <strong id="task-name">Add-1</strong>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Level</span>
+              <strong id="level-value">1</strong>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Score</span>
+              <strong id="score-value">0</strong>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Lives</span>
+              <strong id="lives-value">3</strong>
+            </div>
           </div>
 
-          <div class="challenge-box">
-            <p class="label">Current challenge</p>
-            <div id="prompt-value" class="prompt-value">—</div>
+          <!-- Cognitive Load Meter -->
+          <div class="cognitive-meter-container">
+            <div class="meter-header">
+              <span class="meter-title">System 2 Effort Utilization</span>
+              <span id="cognitive-tier-label" class="tier-badge">System 1 · Low Demand</span>
+            </div>
+            <div class="meter-track">
+              <div id="cognitive-load-fill" class="meter-fill" style="width: 15%;"></div>
+            </div>
+            <div class="meter-benchmarks">
+              <span>0% Ease</span>
+              <span class="bm-mark" style="left: 25%;">Add-1 (+5%)</span>
+              <span class="bm-mark" style="left: 50%;">Add-2 (+10%)</span>
+              <span class="bm-mark" style="left: 75%;">Add-3 (+16%)</span>
+              <span class="bm-mark" style="left: 95%;">Overload</span>
+              <span>100% Limit</span>
+            </div>
+          </div>
+
+          <div class="challenge-box" id="challenge-box">
+            <div class="box-header">
+              <p class="label">Working Memory Buffer</p>
+              <div id="metronome-visual" class="metronome-visual" title="Metronome tempo pulse"></div>
+            </div>
+            <div id="prompt-value" class="prompt-value" aria-live="polite">—</div>
+            <div id="pacing-progress" class="pacing-dots" style="display: none;">
+              <span class="p-dot"></span><span class="p-dot"></span><span class="p-dot"></span><span class="p-dot"></span>
+            </div>
+            <div id="peripheral-probe" class="peripheral-probe" style="display: none;">◆</div>
           </div>
 
           <form id="answer-form" class="answer-form">
-            <label for="answer-input">Your answer</label>
+            <label for="answer-input">
+              Your answer <span class="input-hint">(add <span id="level-hint">1</span> to each digit, wrap at 10)</span>
+            </label>
             <div class="answer-row">
               <input
                 id="answer-input"
@@ -41,50 +141,221 @@
                 inputmode="numeric"
                 autocomplete="off"
                 maxlength="4"
-                placeholder="enter 4 digits"
+                placeholder="4 digits (e.g. 6302)"
+                required
               />
-              <button type="submit">Submit</button>
+              <button id="submit-btn" type="submit">Submit</button>
+              <button id="skip-btn" type="button" class="secondary-button" title="Skip round / test overload failure">
+                Pass
+              </button>
             </div>
           </form>
 
           <div id="message-box" class="message-box info">
-            Begin the task and add the level to each digit.
+            Add 1 to each digit in the challenge. Keep a steady mental rhythm!
+          </div>
+
+          <!-- Kahneman Quotation / Chapter Note -->
+          <div class="quote-card">
+            <p id="kahneman-quote" class="quote-text">
+              "The pupil of the eye is a window to the soul, and also a remarkably sensitive electrical meter of mental effort."
+            </p>
+            <span class="quote-author">— Daniel Kahneman, Thinking, Fast and Slow (Ch. 2)</span>
           </div>
         </section>
 
+        <!-- Vision, Pupillometry & Telemetry Aside -->
         <aside class="panel camera-panel">
-          <h2>Webcam feed</h2>
-          <video id="camera-preview" autoplay muted playsinline></video>
-          <canvas id="eye-analysis-canvas" width="320" height="240" aria-label="Eye analysis debug canvas"></canvas>
+          <div class="camera-panel-header">
+            <h2>Pupillometry Telemetry</h2>
+            <span id="feed-mode-badge" class="mode-badge demo">Simulation Mode</span>
+          </div>
+
+          <div class="viewport-wrapper">
+            <video id="camera-preview" autoplay muted playsinline></video>
+            <canvas id="eye-analysis-canvas" width="320" height="240" aria-label="Eye analysis debug canvas"></canvas>
+            <div id="simulation-eye-container" class="simulation-eye-container">
+              <canvas id="simulation-eye-canvas" width="320" height="240" aria-label="Physiological eye simulation canvas"></canvas>
+            </div>
+          </div>
+
           <div class="retina-panel">
-            <div class="retina-label">Retina / pupil preview</div>
+            <div class="retina-header">
+              <span class="retina-label">Pupil Reticle Crop</span>
+              <span id="pupil-metric-badge" class="metric-badge">Ø ~24.0px</span>
+            </div>
             <canvas id="retina-preview" width="180" height="180" aria-label="Retina crop preview"></canvas>
           </div>
+
           <div class="camera-meta">
-            <span id="camera-status">Camera not active</span>
-            <span id="load-index">Load index: 0.0</span>
+            <span id="camera-status">Simulation active</span>
+            <span id="load-index">Load index: 15.0</span>
           </div>
+
           <div id="analysis-result" class="analysis-result info">
-            No analysis yet. Record a short clip to estimate pupil dilation.
+            Ready. Start a round to measure pupil dilation and System 2 exertion.
           </div>
+
           <div class="attempt-panel">
             <div class="attempt-header">
-              <span>Level attempts</span>
+              <span>Eye Crops & Telemetry</span>
+              <div id="attempt-tabs" class="attempt-tabs">
+                <button type="button" class="tab-pill active" id="tab-current" data-tab="current">Level</button>
+                <button type="button" class="tab-pill" id="tab-all" data-tab="all">All Crops (<span id="total-crops-count">0</span>)</button>
+              </div>
               <span id="attempt-counter">0 / 4</span>
             </div>
             <div id="attempt-thumbnails" class="attempt-thumbnails" aria-live="polite"></div>
           </div>
+
           <div class="chart-panel">
-            <div class="chart-header">Dilation trend</div>
-            <canvas id="dilation-chart" width="260" height="120" aria-label="Dilation trend chart"></canvas>
+            <div class="chart-header">
+              <span>Pupil Dilation Curve (%)</span>
+              <span class="chart-legend">
+                <span class="dot-user"></span> Measured
+                <span class="dot-kahneman"></span> Kahneman '66
+              </span>
+            </div>
+            <canvas id="dilation-chart" width="280" height="130" aria-label="Dilation trend chart"></canvas>
           </div>
-          <div id="analysis-log" class="analysis-log" aria-live="polite">
-            <div class="analysis-log-entry">Waiting for webcam...</div>
+
+          <div class="analysis-log-wrapper">
+            <div class="log-header">
+              <span>Lab Telemetry Stream</span>
+              <button id="clear-log-btn" type="button" class="tiny-btn">Clear</button>
+            </div>
+            <div id="analysis-log" class="analysis-log" aria-live="polite">
+              <div class="analysis-log-entry">Cognitive Pupillometry Lab ready.</div>
+            </div>
+          </div>
+
+          <div class="actions-footer">
+            <button id="summary-btn" type="button" class="secondary-button full-width">
+              📊 View Cognitive Session Summary
+            </button>
           </div>
         </aside>
       </main>
+
+      <!-- Science Companion Modal -->
+      <div id="science-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="science-title">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 id="science-title">The Science of Chapter 2: Attention & Effort</h2>
+            <button id="close-science-btn" type="button" class="close-btn" aria-label="Close dialog">&times;</button>
+          </div>
+          <div class="modal-body">
+            <h3>Beatty & Kahneman's Pupillometry Discoveries (1966)</h3>
+            <p>
+              In Chapter 2 of <em>Thinking, Fast and Slow</em>, Daniel Kahneman recounts his foundational experiments conducted with Jackson Beatty.
+              Using an infrared camera focused on participants' eyes, they discovered that the pupil serves as a precise index of mental energy allocation.
+            </p>
+            <div class="science-table-wrap">
+              <table class="science-table">
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Mental Operation</th>
+                    <th>Mean Dilation</th>
+                    <th>Cognitive State</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Add-1</strong></td>
+                    <td>Hold 4 digits, add 1 to each</td>
+                    <td>~5% – 8%</td>
+                    <td>Light System 2 mobilization</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Add-2</strong></td>
+                    <td>Hold 4 digits, add 2 to each</td>
+                    <td>~10% – 14%</td>
+                    <td>Substantial working memory demand</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Add-3</strong></td>
+                    <td>Hold 4 digits, add 3 to each</td>
+                    <td>~15% – 21%</td>
+                    <td>Peak System 2 capacity; intense focus</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Add-4</strong></td>
+                    <td>Add 4 to each digit at tempo</td>
+                    <td>~18% → Collapse</td>
+                    <td>Cognitive overload; System 2 gives up</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>Key Principles Explained in the Book</h3>
+            <ul class="principles-list">
+              <li>
+                <strong>The Electrical Meter of the Brain:</strong> Unlike heart rate or galvanic skin response, pupil dilation reflects the moment-to-moment rate at which mental energy is spent. Pupils expand as digits are held and computed, peak at the point of answer generation, and rapidly contract when the answer is voiced.
+              </li>
+              <li>
+                <strong>Working Memory Bottleneck:</strong> Humans can effortlessly retain 4 chunks. Transforming all 4 simultaneously demands continuous refresh cycles in the phonological loop and central executive.
+              </li>
+              <li>
+                <strong>The Law of Least Effort:</strong> System 2 is inherently lazy. Given alternative paths, the mind selects the least demanding. When forced into high load, peripheral awareness shrinks.
+              </li>
+              <li>
+                <strong>Attentional Blindness (The Invisible Gorilla):</strong> Intense System 2 concentration renders you functionally blind to peripheral stimuli. This app's optional probe demonstrates this effect directly.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cognitive Session Summary Modal -->
+      <div id="summary-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="summary-title">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 id="summary-title">Cognitive Assessment Report</h2>
+            <button id="close-summary-btn" type="button" class="close-btn" aria-label="Close dialog">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="summary-stats-grid">
+              <div class="summary-stat-box">
+                <span class="sum-label">Rounds Completed</span>
+                <strong id="sum-rounds">0</strong>
+              </div>
+              <div class="summary-stat-box">
+                <span class="sum-label">Accuracy Rate</span>
+                <strong id="sum-accuracy">0%</strong>
+              </div>
+              <div class="summary-stat-box">
+                <span class="sum-label">Avg Response Time</span>
+                <strong id="sum-latency">0.0s</strong>
+              </div>
+              <div class="summary-stat-box">
+                <span class="sum-label">Peak Dilation</span>
+                <strong id="sum-peak-dilation">0.0%</strong>
+              </div>
+            </div>
+
+            <div class="assessment-section">
+              <h3>System 2 Cognitive Profile</h3>
+              <p id="sum-profile-text">
+                Complete a few rounds in Campaign or Lab mode to generate your cognitive exertion profile.
+              </p>
+            </div>
+
+            <div class="modal-actions">
+              <button id="download-report-btn" type="button" class="secondary-button">
+                💾 Export JSON Telemetry
+              </button>
+              <button id="reset-session-btn" type="button" class="secondary-button">
+                🔄 Reset Session
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Scripts -->
     <script src="{% static 'kahneman_game/mediapipe/vision_bundle.js' %}"></script>
     <script src="{% static 'kahneman_game/app.js' %}"></script>
   </body>

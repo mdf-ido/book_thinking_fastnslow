@@ -1,34 +1,40 @@
-# Chapter 2: Attention and Effort
+# Chapter 2: Attention and Effort · Terminal Experiment
 
-This folder contains a small interactive demonstration inspired by Daniel Kahneman's discussion of effortful thinking and mental workload.
+This folder hosts the terminal-based cognitive effort simulation inspired by Daniel Kahneman's *Thinking, Fast and Slow* (Chapter 2).
 
-## Demo: Add-Overload
+## Features
 
-`addNoverload.py` simulates a short arithmetic task where each digit is increased by a running level value. The user is prompted to answer under time pressure, while the script also tries to estimate a rough eye-based "load index" using MediaPipe face landmarks.
+- **Add-N Working Memory Challenge**: Hold 4 digits in memory and transform each by adding $N$ (with modulo 10 wrapping).
+- **Pupillometric Load Estimation**:
+  - Live webcam tracking with MediaPipe and OpenCV (when webcam is connected).
+  - Physiological simulation mode based on Jackson Beatty & Daniel Kahneman's 1966 empirical research.
+- **Cognitive Diagnostics**: Categorizes your effort into Kahneman's cognitive tiers:
+  - *System 1 / Light Load* (<7% dilation)
+  - *System 2 · Active Focus* (7–13% dilation)
+  - *System 2 · Near Max Capacity* (13–20% dilation)
+  - *System 2 · Cognitive Overload* (>20% dilation or performance drop)
 
-## How to run
-
-From the repo root:
+## Usage
 
 ```bash
-poetry install
+# Run interactive experiment
 poetry run python ch2-attentionandeffort/addNoverload.py
+
+# Run in simulation mode (no camera needed)
+poetry run python ch2-attentionandeffort/addNoverload.py --demo
+
+# View the 1966 Kahneman & Beatty empirical benchmark table
+poetry run python ch2-attentionandeffort/addNoverload.py --benchmark
+
+# Start directly at Level 3 (Add-3 peak effort) with 5 rounds
+poetry run python ch2-attentionandeffort/addNoverload.py --level 3 --rounds 5
 ```
 
-Alternatively, the browser version lives in the repo root and can be run with:
+## Options
 
-```bash
-poetry run python manage.py runserver 0.0.0.0:8000
-```
-
-If the Python environment does not support the webcam/MediaPipe path, the script automatically falls back to a terminal demo mode and still runs the game.
-
-## Conceptual goal
-
-This script is meant to make a psychological idea tangible:
-
-- cognitive effort increases with mental demand
-- performance degrades as the task becomes more taxing
-- attention is a limited resource that can be strained by overload
-
-It is designed as an educational toy, not a scientific instrument.
+| Flag | Description |
+|---|---|
+| `--demo` / `--no-cam` | Run in pure simulation mode without initializing webcam |
+| `--level [1-4]` | Choose starting level (1: Add-1, 2: Add-2, 3: Add-3, 4: Add-4) |
+| `--rounds N` | Number of challenges per level (default: 3) |
+| `--benchmark` | Display Daniel Kahneman & Jackson Beatty's 1966 pupillometry table and exit |
